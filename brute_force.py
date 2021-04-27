@@ -11,7 +11,7 @@ def brute_force(n: int):
     root = Node(player=1, board=root_board)
 
     def construct_tree(node: Node):
-        if node.is_terminal:
+        if node._board.is_terminal:
             return
         node.add_children()
         for child in node.children:

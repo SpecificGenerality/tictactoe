@@ -14,7 +14,7 @@ class Board:
 
     @property
     def is_terminal(self):
-        return self._terminal
+        return self._score != 0
 
     def get_next_moves(self) -> Tuple[List, List]:
         if self.is_terminal:
@@ -37,7 +37,7 @@ class Board:
             if diag_sum == tgt_score:
                 return player
 
-        if i + j == n:
+        if i + j == n - 1:
             anti_diag_sum = np.fliplr(board).trace()
             if anti_diag_sum == tgt_score:
                 return player
@@ -59,11 +59,15 @@ class Board:
         else:
             board = self._board
 
+        if board[i][j] != 0:
+            raise ValueError('Invalid move. Square not empty.')
+
         board[i][j] = player
+
         score = Board.score_move(board, player, i, j)
 
-        if score != 0 and not copy_board:
-            self._terminal = True
+        if not copy_board:
+            self._score = score
 
         return Board(board, score)
 
@@ -75,18 +79,27 @@ class Node:
 
     @classmethod
     def size(cls, node):
-        def size_helper(node, acc: int):
-            if node.is_terminal:
-                return acc + 1
-            else:
-                for child in node.children:
-                    acc += size_helper(child, acc)
-                return acc
-        return size_helper(node, 0)
+        if node.is_terminal:
+            return 1
+        else:
+            count = 1
+            for child in node.children:
+                count += cls.size(child)
+            return count
+
+    @classmethod
+    def num_leaves(cls, node):
+        if node.is_terminal:
+            return 1
+        else: 
+            count = 0
+            for child in node.children:
+                count += cls.num_leaves(child)
+            return count
 
     @property
     def is_terminal(self):
-        return self._board.is_terminal
+        return len(self._children) == 0
 
     @property
     def children(self):
