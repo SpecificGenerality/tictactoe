@@ -1,5 +1,6 @@
 import argparse
 import pickle
+import sys
 
 import numpy as np
 
@@ -18,7 +19,33 @@ def brute_force(n: int):
             construct_tree(child)
 
     construct_tree(root)
+    minimax(root)
     return root
+
+
+def minimax(root: Node):
+    def max_value(node: Node):
+        if node.is_terminal:
+            node._value = node._board._score
+            return node._board._score
+        v = -sys.maxsize
+        for child in node.children:
+            v = max(v, min_value(child))
+        node._value = v
+        node._optmove = np.argmax([child._value for child in node.children])
+        return v
+
+    def min_value(node: Node):
+        if node.is_terminal:
+            node._value = node._board._score
+            return node._value
+        v = sys.maxsize
+        for child in node.children:
+            v = min(v, max_value(child))
+        node._value = v
+        node._optmove = np.argmin([child._value for child in node.children])
+        return v
+    return max_value(root) if (root._player == 1) else min_value(root)
 
 
 if __name__=='__main__':
