@@ -1,6 +1,7 @@
 import numpy as np
 from typing import Tuple, List
 
+
 class Board:
     def __init__(self, board, score=0):
         n, m = board.shape
@@ -76,6 +77,8 @@ class Node:
         self._player = player
         self._board = board
         self._children = []
+        self._optmove = None
+        self._value = None
 
     @classmethod
     def size(cls, node):
@@ -91,7 +94,7 @@ class Node:
     def num_leaves(cls, node):
         if node.is_terminal:
             return 1
-        else: 
+        else:
             count = 0
             for child in node.children:
                 count += cls.num_leaves(child)
@@ -115,7 +118,7 @@ class Node:
         child_player = self._player * -1
         x, y = self._board.get_next_moves()
         for i in range(len(x)):
-            child_board = self._board.move(child_player, x[i], y[i], copy_board=True)
+            child_board = self._board.move(self._player, x[i], y[i], copy_board=True)
             child_node = Node(child_player, child_board)
             self._children.append(child_node)
 
